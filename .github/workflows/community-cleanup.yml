@@ -1,0 +1,81 @@
+name: Verify RFTSystems4Ai community starters
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/community-cleanup-trigger.txt'
+
+permissions:
+  contents: read
+  discussions: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deduplicate and verify starter discussions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh discussion list -R "$REPO" --state all --limit 100 --json id,number,title,category,url > discussions-before.json
+
+          python3 - <<'PY'
+          import json, os, subprocess
+
+          starters = {
+              "Welcome to the RFTSystems4Ai Community": "Announcements",
+              "What are you trying to verify with RFTSystems4Ai?": "General",
+              "What public verification challenge should we add next?": "Ideas",
+              "Start here: what does a RFTSystems4Ai verification result actually establish?": "Q&A",
+              "Show us what you tested — PASS, FAIL or unexpected": "Show and tell",
+          }
+
+          with open("discussions-before.json", encoding="utf-8") as f:
+              data = json.load(f)
+
+          query = "mutation($id:ID!){deleteDiscussion(input:{id:$id}){clientMutationId}}"
+          for title, expected_category in starters.items():
+              matches = sorted((d for d in data if d.get("title") == title), key=lambda d: d["number"])
+              print(f"{title}: found {[d['number'] for d in matches]}")
+              if not matches:
+                  raise SystemExit(f"Missing starter discussion: {title}")
+              for duplicate in matches[1:]:
+                  subprocess.run(
+                      ["gh", "api", "graphql", "-f", f"id={duplicate['id']}", "-f", f"query={query}"],
+                      check=True,
+                      env=os.environ.copy(),
+                  )
+                  print(f"Deleted duplicate discussion #{duplicate['number']}")
+          PY
+
+          gh discussion list -R "$REPO" --state all --limit 100 --json id,number,title,category,url > discussions-after.json
+
+          python3 - <<'PY'
+          import json
+
+          starters = {
+              "Welcome to the RFTSystems4Ai Community": "Announcements",
+              "What are you trying to verify with RFTSystems4Ai?": "General",
+              "What public verification challenge should we add next?": "Ideas",
+              "Start here: what does a RFTSystems4Ai verification result actually establish?": "Q&A",
+              "Show us what you tested — PASS, FAIL or unexpected": "Show and tell",
+          }
+
+          with open("discussions-after.json", encoding="utf-8") as f:
+              data = json.load(f)
+
+          for title, expected_category in starters.items():
+              matches = [d for d in data if d.get("title") == title]
+              if len(matches) != 1:
+                  raise SystemExit(f"Expected one starter for {title!r}; found {len(matches)}")
+              d = matches[0]
+              category = d.get("category") or {}
+              category_name = category.get("name") if isinstance(category, dict) else str(category)
+              if category_name != expected_category:
+                  raise SystemExit(f"Wrong category for {title!r}: {category_name!r} != {expected_category!r}")
+              print(f"VERIFIED #{d['number']} | {category_name} | {d['title']} | {d['url']}")
+          PY
