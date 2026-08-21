@@ -1,0 +1,41 @@
+name: live-release-gate
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  live-browser-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Wait for public Pages deployment and verify every live route
+        run: |
+          set -euo pipefail
+          urls=(
+            "https://rftsystems4ai.github.io/"
+            "https://rftsystems4ai.github.io/lab/start-here/"
+            "https://rftsystems4ai.github.io/lab/flight-recorder/"
+            "https://rftsystems4ai.github.io/lab/memory-receipt/"
+            "https://rftsystems4ai.github.io/lab/timelinediff/"
+            "https://rftsystems4ai.github.io/lab/truststack/"
+            "https://rftsystems4ai.github.io/lab/official-receipt-verifier/"
+            "https://rftsystems4ai.github.io/challenge/001-break-flight-recorder/"
+            "https://rftsystems4ai.github.io/evolution-data/"
+            "https://rftsystems4ai.github.io/evolution-data/verify.html"
+          )
+          for url in "${urls[@]}"; do
+            echo "Checking $url"
+            curl --fail --silent --show-error --location --retry 18 --retry-delay 5 --retry-all-errors --max-time 20 "$url" -o /tmp/page.html
+            test -s /tmp/page.html
+          done
+      - name: Install isolated browser-test dependency
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.57.0
+          npx playwright install --with-deps chromium firefox webkit
+      - name: Run live Chromium, Firefox and WebKit client journeys
+        run: node test/live-browser-gate.mjs
