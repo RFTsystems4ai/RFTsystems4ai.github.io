@@ -1,0 +1,98 @@
+name: Seed RFTSystems4Ai community
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/seed-community.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  discussions: write
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create starter discussions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          create_if_missing() {
+            category="$1"
+            title="$2"
+            body_file="$3"
+            if gh discussion list -R "$REPO" --state all --limit 100 --json title --jq '.[].title' | grep -Fxq "$title"; then
+              echo "Already exists: $title"
+            else
+              gh discussion create -R "$REPO" --category "$category" --title "$title" --body-file "$body_file"
+            fi
+          }
+
+          cat > welcome.md <<'EOF'
+          Welcome to the RFTSystems4Ai Community.
+
+          This is the public discussion space around the RFTSystems4Ai demonstration environment: verification questions, falsification attempts, independent artefact checks, DecisionFamily / Evolution Data experiments, and ideas for stronger public tests.
+
+          Start with the live demonstrations: https://rftsystems4ai.github.io/
+
+          Community standard: bring reproducible, public-safe evidence where possible. A PASS or valid signature proves only the verification scope it declares; it does not automatically make an underlying factual statement true. A legitimate FAIL is useful evidence too.
+
+          Please do not post credentials, signing keys, private company data, or confidential material.
+          EOF
+
+          cat > general.md <<'EOF'
+          What are you trying to verify, falsify, reproduce or recover from an AI decision?
+
+          This thread is an open place to introduce your use case and point to the public RFTSystems4Ai demonstration that interests you most. You do not need a finished integration. A concrete failure mode, reproducibility problem or evidence question is enough to start a useful discussion.
+
+          If you tested something, include the browser/demo used and the observed PASS, FAIL or unexpected behaviour where safe to share.
+          EOF
+
+          cat > ideas.md <<'EOF'
+          The strongest additions to RFTSystems4Ai are tests that can fail clearly.
+
+          What public challenge, verifier behaviour or DecisionFamily scenario would make the demonstration environment more useful to you?
+
+          Good suggestions include a clear problem, the evidence you would expect to inspect, and a simple way to decide whether the proposed demonstration passes or fails. Please keep suggestions at the capability/test level rather than asking for private implementation details.
+          EOF
+
+          cat > qa.md <<'EOF'
+          A useful starting distinction for every RFTSystems4Ai result is this:
+
+          - integrity: did the artefact still match its committed evidence?
+          - authenticated origin: did it verify against the trusted RFTSystems4Ai release key where that scope applies?
+          - factual truth: is the underlying real-world statement itself true?
+
+          Those are not the same claim.
+
+          Use this Q&A thread for focused questions about what a demonstration proves, what it deliberately does not prove, how to reproduce a result, or why a verifier returned PASS or FAIL. Link only public-safe evidence.
+          EOF
+
+          cat > show.md <<'EOF'
+          Tested one of the RFTSystems4Ai demonstrations? Share the result here.
+
+          PASS, FAIL and unexpected behaviour are all welcome. The useful part is making the observation reproducible.
+
+          Suggested format:
+          1. Which public demonstration or verifier did you use?
+          2. What did you change or test?
+          3. What result did you observe?
+          4. Can somebody else reproduce or independently inspect it?
+          5. What does the result not establish?
+
+          Do not include private credentials, signing material or confidential company data.
+          EOF
+
+          create_if_missing "Announcements" "Welcome to the RFTSystems4Ai Community" welcome.md
+          create_if_missing "General" "What are you trying to verify with RFTSystems4Ai?" general.md
+          create_if_missing "Ideas" "What public verification challenge should we add next?" ideas.md
+          create_if_missing "Q&A" "Start here: what does a RFTSystems4Ai verification result actually establish?" qa.md
+          create_if_missing "Show and tell" "Show us what you tested — PASS, FAIL or unexpected" show.md
+
+          echo "Starter discussions seeded."
