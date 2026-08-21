@@ -69,8 +69,9 @@ function timelineRun(run,label){
   trustBoundary(run.trust_boundary,`TimelineDiff run ${label} trust boundary`);
   eventKeys(run.events,['session_id','seq','kind','payload','prev_hash','event_hash'],`TimelineDiff run ${label} event`);
 }
+async function timelineIntegrity(run){let prev='0'.repeat(64),first=null;for(const e of run.events){const core={session_id:e.session_id,seq:e.seq,kind:e.kind,payload:e.payload,prev_hash:prev},hash=await sha256Hex(canonicalise(core));if(first===null&&(e.prev_hash!==prev||e.event_hash!==hash))first=e.seq;prev=hash;}if(first===null&&run.final_anchor!==prev)first=run.events.length;return{status:first===null?'PASS':'FAIL',first_failure_event:first};}
 function expectedTimelineDifferences(A,B){let first=null,count=0,rows=[];const n=Math.max(A.events.length,B.events.length);for(let i=0;i<n;i++){const a=A.events[i],b=B.events[i],same=!!a&&!!b&&a.kind===b.kind&&canonicalise(a.payload)===canonicalise(b.payload);if(!same){count++;if(first===null)first=i+1;rows.push({seq:i+1,run_a:a?{kind:a.kind,payload:a.payload}:null,run_b:b?{kind:b.kind,payload:b.payload}:null});}}return{first,count,rows};}
-function validateTimeline(artifact,derived){
+async function validateTimeline(artifact,derived){
   exactKeys(artifact,['run_a','run_b','diff','verification_note'],'TimelineDiff artefact');
   if(artifact.verification_note!==NOTE_TIMELINE)throw new Error('TimelineDiff verification note mismatch');
   timelineRun(artifact.run_a,'A');timelineRun(artifact.run_b,'B');
@@ -84,12 +85,11 @@ function validateTimeline(artifact,derived){
   const expected=expectedTimelineDifferences(artifact.run_a,artifact.run_b);
   if(diff.first_divergence!==expected.first||diff.differing_events!==expected.count)throw new Error('TimelineDiff summary does not match independent behavioural recomputation');
   exact(diff.differences,expected.rows,'TimelineDiff difference rows');
-  const status=derived.verdict;
-  if(diff.verification_status!==status)throw new Error('TimelineDiff embedded verification status mismatch');
-  const aStatus=derived.run_a_chain_consistent?'PASS':'FAIL',bStatus=derived.run_b_chain_consistent?'PASS':'FAIL';
-  if(diff.run_integrity.run_a.status!==aStatus||diff.run_integrity.run_b.status!==bStatus)throw new Error('TimelineDiff embedded run-integrity status mismatch');
-  if(aStatus==='PASS'&&diff.run_integrity.run_a.first_failure_event!==null)throw new Error('TimelineDiff run A failure marker mismatch');
-  if(bStatus==='PASS'&&diff.run_integrity.run_b.first_failure_event!==null)throw new Error('TimelineDiff run B failure marker mismatch');
+  if(diff.verification_status!==derived.verdict)throw new Error('TimelineDiff embedded verification status mismatch');
+  const aIntegrity=await timelineIntegrity(artifact.run_a),bIntegrity=await timelineIntegrity(artifact.run_b);
+  exact(diff.run_integrity.run_a,aIntegrity,'TimelineDiff run A integrity result');
+  exact(diff.run_integrity.run_b,bIntegrity,'TimelineDiff run B integrity result');
+  if((aIntegrity.status==='PASS')!==derived.run_a_chain_consistent||(bIntegrity.status==='PASS')!==derived.run_b_chain_consistent)throw new Error('TimelineDiff independent integrity engines disagree');
 }
 
 function validateChallenge(artifact,derived){
@@ -105,8 +105,16 @@ function validateTrustStack(artifact,derived){
   allowedKeys(packet,['name','payload','stored_hash','key_id','signature','scope'],['presented_public_key'],'TrustStack packet');
   exactKeys(artifact.decision,['verdict','scope'],'TrustStack decision');
   if(artifact.decision.verdict!==derived.verdict)throw new Error('TrustStack embedded verdict mismatch');
-  const scopes={signed:'Integrity + trusted-key signature verified',legacy:'Integrity only · no signature',tampered:'Payload commitment failed.',substituted:'Signer is not in the verifier trust store'};
-  if(artifact.decision.scope!==scopes[artifact.packet_state])throw new Error('TrustStack embedded decision scope mismatch');
+  const expectations={
+    signed:{name:'Signed + intact',packetScope:'signed-evidence',decisionScope:'Integrity + trusted-key signature verified',presented:false},
+    legacy:{name:'Legacy + intact',packetScope:'integrity-only',decisionScope:'Integrity only · no signature',presented:false},
+    tampered:{name:'Signed + altered',packetScope:'signed-evidence',decisionScope:'Payload commitment failed.',presented:false},
+    substituted:{name:'Self-signed + untrusted key',packetScope:'signed-evidence',decisionScope:'Signer is not in the verifier trust store',presented:true}
+  };
+  const expected=expectations[artifact.packet_state];if(!expected)throw new Error('TrustStack packet state is outside the public contract');
+  if(packet.name!==expected.name||packet.scope!==expected.packetScope)throw new Error('TrustStack packet label/scope mismatch');
+  if(('presented_public_key'in packet)!==expected.presented)throw new Error('TrustStack presented-key field mismatch');
+  if(artifact.decision.scope!==expected.decisionScope)throw new Error('TrustStack embedded decision scope mismatch');
 }
 
 export async function verifyDemoBundle(bundle){
@@ -115,7 +123,7 @@ export async function verifyDemoBundle(bundle){
   const artifact=object(bundle.artifact,'artefact');
   if(result.surface_id==='agent-flight-recorder')validateFlight(artifact);
   else if(result.surface_id==='memory-receipt')await validateMemory(artifact,bundle.official_release.release_core.contracts['memory-receipt']);
-  else if(result.surface_id==='timelinediff')validateTimeline(artifact,result.derived);
+  else if(result.surface_id==='timelinediff')await validateTimeline(artifact,result.derived);
   else if(result.surface_id==='falsification-001')validateChallenge(artifact,result.derived);
   else if(result.surface_id==='truststack')validateTrustStack(artifact,result.derived);
   else throw new Error('Unsupported public demonstration surface');
