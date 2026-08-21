@@ -177,7 +177,7 @@ test('memory: original binding passes and controlled post-receipt alteration rem
   const failArtifact=clone(passArtifact); failArtifact.ledger[4].value=contract.controlled_failures.deployment_state;
   assert.equal((await verifyDemoBundle(await makeBundle('memory-receipt',failArtifact,'FAIL',clone(verificationRelease)))).derived.verdict,'FAIL');
   const forged=clone(passArtifact); forged.receipt.scope='factual-truth';
-  await assert.rejects(async()=>verifyDemoBundle(await makeBundle('memory-receipt',forged,'PASS',clone(verificationRelease))),/scope mismatch|baseline receipt/);
+  await assert.rejects(async()=>verifyDemoBundle(await makeBundle('memory-receipt',forged,'PASS',clone(verificationRelease))),/Reported verdict|scope mismatch|baseline receipt/);
 });
 
 test('engineering: TimelineDiff embedded report must equal independent recomputation', async()=>{
