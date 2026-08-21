@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 const BASE='https://rftsystems4ai.github.io';
 const browsers=[['chromium',chromium],['firefox',firefox],['webkit',webkit]];
 
-async function expectText(page,selector,pattern,timeout=15000){await page.locator(selector).waitFor({state:'visible',timeout});const text=(await page.locator(selector).innerText()).trim();assert.match(text,pattern,`${page.url()} ${selector} => ${text}`);return text;}
+async function expectText(page,selector,pattern,timeout=15000){await page.locator(selector).waitFor({state:'visible',timeout});await page.waitForFunction(([sel,src,flags])=>new RegExp(src,flags).test((document.querySelector(sel)?.textContent||'').trim()),[selector,pattern.source,pattern.flags],{timeout});const text=(await page.locator(selector).innerText()).trim();assert.match(text,pattern,`${page.url()} ${selector} => ${text}`);return text;}
 async function captureDownload(page,clickSelector){const [download]=await Promise.all([page.waitForEvent('download'),page.locator(clickSelector).click()]);return await download.path();}
 async function noPageErrors(page,label){const errors=[];page.on('pageerror',e=>errors.push(String(e)));page.on('console',msg=>{if(msg.type()==='error')errors.push(`console: ${msg.text()}`)});return()=>assert.deepEqual(errors,[],`${label} browser errors: ${errors.join(' | ')}`);}
 
