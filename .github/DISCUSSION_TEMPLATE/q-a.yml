@@ -1,0 +1,40 @@
+title: "[Q&A] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask a focused question about a public RFTSystems4Ai demonstration or verifier. A good question makes it possible for another person to reproduce the situation or explain the declared verification scope.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which public demonstration is this about?
+      options:
+        - Agent Flight Recorder
+        - Memory Receipt Engine
+        - TimelineDiff
+        - TrustStack
+        - Official Artefact Verifier
+        - Falsification Challenge #001
+        - Evolution Data / DecisionFamily
+        - General RFTSystems4Ai
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: What is your question?
+      placeholder: Ask one clear question.
+    validations:
+      required: true
+  - type: textarea
+    id: attempted
+    attributes:
+      label: What have you already tried?
+      description: Include steps another person could repeat where useful.
+      placeholder: Describe the test, browser, artefact or verifier action you tried.
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Public-safe evidence
+      description: Optional receipt/verifier output or other reproducible context. Do not post credentials, signing keys or confidential data.
+      placeholder: Paste only information safe to publish.
