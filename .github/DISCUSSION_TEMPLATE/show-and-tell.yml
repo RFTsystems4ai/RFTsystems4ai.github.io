@@ -1,0 +1,34 @@
+title: "[Show and tell] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share a public-safe experiment, integration, receipt check, falsification attempt or other work built around the RFTSystems4Ai demonstrations.
+  - type: textarea
+    id: made
+    attributes:
+      label: What did you test or build?
+      placeholder: Describe the experiment, integration or result.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What happened?
+      description: Include PASS, FAIL or unexpected behaviour exactly as observed.
+      placeholder: Report the observed result without overstating what it proves.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How can someone reproduce or inspect it?
+      description: Add public-safe steps, receipt details or links where appropriate.
+      placeholder: Give enough information for another person to try it.
+    validations:
+      required: true
+  - type: textarea
+    id: limits
+    attributes:
+      label: Limits or open questions
+      placeholder: What does this result not establish, or what would you test next?
