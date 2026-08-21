@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   discussions: write
 
 jobs:
@@ -95,4 +95,20 @@ jobs:
           create_if_missing "Q&A" "Start here: what does a RFTSystems4Ai verification result actually establish?" qa.md
           create_if_missing "Show and tell" "Show us what you tested — PASS, FAIL or unexpected" show.md
 
-          echo "Starter discussions seeded."
+          titles=$(gh discussion list -R "$REPO" --state all --limit 100 --json title --jq '.[].title')
+          for required in \
+            "Welcome to the RFTSystems4Ai Community" \
+            "What are you trying to verify with RFTSystems4Ai?" \
+            "What public verification challenge should we add next?" \
+            "Start here: what does a RFTSystems4Ai verification result actually establish?" \
+            "Show us what you tested — PASS, FAIL or unexpected"; do
+            printf '%s\n' "$titles" | grep -Fxq "$required"
+          done
+
+          marker="Community seed verified at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          encoded=$(printf '%s\n' "$marker" | base64 -w0)
+          gh api --method PUT "repos/$REPO/contents/.github/community-seed-complete.txt" \
+            -f message='Record community seed completion' \
+            -f content="$encoded" >/dev/null
+
+          echo "Starter discussions seeded and verified."
