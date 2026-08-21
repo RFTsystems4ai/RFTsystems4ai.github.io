@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/seed-community.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/community-seed-trigger.txt'
   workflow_dispatch:
 
 permissions:
@@ -104,11 +108,5 @@ jobs:
             "Show us what you tested — PASS, FAIL or unexpected"; do
             printf '%s\n' "$titles" | grep -Fxq "$required"
           done
-
-          marker="Community seed verified at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          encoded=$(printf '%s\n' "$marker" | base64 -w0)
-          gh api --method PUT "repos/$REPO/contents/.github/community-seed-complete.txt" \
-            -f message='Record community seed completion' \
-            -f content="$encoded" >/dev/null
 
           echo "Starter discussions seeded and verified."
