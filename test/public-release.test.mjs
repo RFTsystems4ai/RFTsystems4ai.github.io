@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import { webcrypto } from 'node:crypto';
+if(!globalThis.crypto)globalThis.crypto=webcrypto;
+import {verifySignedRelease} from '../lab/official-receipt-verifier/receipt-crypto.js';
+import {verifyRelease as verifyEvolutionRelease,recomputeResult,sha256Hex} from '../evolution-data/verify-crypto.js';
+const root=path.resolve(new URL('..',import.meta.url).pathname);
+function windowScript(file,key){const source=fs.readFileSync(path.join(root,file),'utf8'),context={window:{}};vm.createContext(context);vm.runInContext(source,context,{filename:file});return context.window[key];}
+function walk(dir){return fs.readdirSync(dir,{withFileTypes:true}).flatMap(e=>e.isDirectory()?walk(path.join(dir,e.name)):[path.join(dir,e.name)]);}
+const pages=['lab/start-here/index.html','lab/flight-recorder/index.html','lab/memory-receipt/index.html','lab/timelinediff/index.html','lab/truststack/index.html','lab/official-receipt-verifier/index.html','challenge/001-break-flight-recorder/index.html','evolution-data/index.html','evolution-data/verify.html'];
+
+test('signed verification release authenticates with pinned Ed25519 key',async()=>{const release=windowScript('assets/official-release.js','RFT_OFFICIAL_RELEASE');const r=await verifySignedRelease(release);assert.equal(r.valid,true);assert.equal(r.release_core.issuer.name,'RFTSystems4Ai');});
+test('signed Evolution Data release authenticates with pinned Ed25519 key',async()=>{const release=windowScript('evolution-data/official-release.js','RFT_EVOLUTION_RELEASE');const r=await verifyEvolutionRelease(release);assert.equal(r.core.issuer.name,'RFTSystems4Ai');});
+test('Evolution Data signed dataset commitment and every public revaluation combination are deterministic',async()=>{const data=windowScript('evolution-data/data.js','EVOLUTION_DEMO_DATA'),release=windowScript('evolution-data/official-release.js','RFT_EVOLUTION_RELEASE'),contract=release.release_core.contract;assert.equal(await sha256Hex(JSON.stringify(data)),contract.dataset_sha256_json_stringify);for(const scenario of contract.allowed_scenarios)for(const retention of contract.allowed_retention){const a=recomputeResult(data,scenario,retention),b=recomputeResult(data,scenario,retention);assert.deepEqual(a,b);assert.equal(a.portfolio.family_count,10);}});
+test('all public interactive pages carry restrictive CSP and legal identity',()=>{for(const page of pages){const text=fs.readFileSync(path.join(root,page),'utf8');assert.match(text,/connect-src 'none'/,`${page} missing no-network CSP`);assert.match(text,/RFTSystems4Ai is a trading name of Liam S Grinstead, sole trader\./,`${page} missing legal identity`);assert.match(text,/© 2026 Liam S Grinstead\. All rights reserved\./,`${page} missing copyright`);}});
+test('publication surface contains no protected-source breadcrumbs, payment/runtime dependencies or private signing material',()=>{const forbidden=[/huggingface/i,/sources-private/i,/private-integrations/i,/ai-verification-workshop/i,/BEGIN PRIVATE KEY/i,/RFTSYSTEMS4AI_RECEIPT_PRIVATE_KEY/i,/stripe/i,/vercel/i,/cloudflare/i];const files=walk(root).filter(f=>!f.includes(`${path.sep}.git${path.sep}`)&&!f.includes(`${path.sep}test${path.sep}`)&&!f.includes(`${path.sep}.github${path.sep}`));for(const file of files){const text=fs.readFileSync(file,'utf8');for(const pattern of forbidden)assert.doesNotMatch(text,pattern,`${path.relative(root,file)} contains forbidden publication term ${pattern}`);}});
+test('all local navigation targets referenced by final public pages exist',()=>{for(const page of pages){const full=path.join(root,page),dir=path.dirname(full),html=fs.readFileSync(full,'utf8');for(const match of html.matchAll(/(?:href|src)="([^"#?]+)"/g)){const ref=match[1];if(/^(?:https?:|mailto:|data:)/.test(ref))continue;let target=path.resolve(dir,ref);if(ref.endsWith('/'))target=path.join(target,'index.html');assert.ok(fs.existsSync(target),`${page} references missing ${ref}`);}}});

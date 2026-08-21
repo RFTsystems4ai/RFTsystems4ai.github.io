@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'" />
+  <meta name="theme-color" content="#050814" />
+  <meta name="description" content="RFTSystems4Ai browser-native Agent Flight Recorder demo." />
+  <title>Agent Flight Recorder — RFTSystems4Ai</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="../../assets/legal-footer.css" />
+</head>
+<body>
+  <header class="topbar"><a href="../../" class="brand">RFTSYSTEMS4AI <span>/ AGENT FLIGHT RECORDER</span></a><span class="local">LOCAL BROWSER LAB · NO SERVER</span></header>
+  <main>
+    <section class="hero"><p class="eyebrow">02 / RECORD</p><h1>What did the agent <em>actually do?</em></h1><p class="lead">Build a hash-chained event record in your browser. Then change one event and verify the stored commitments again.</p><div class="scope">This lab tests <b>internal SHA-256 consistency for the generated browser record</b>. A consistent bundle is not automatically independently trusted. Downloads include the signed RFTSystems4Ai demo release contract so the result can be independently recomputed offline.</div></section>
+    <section class="controls panel"><div><span>SESSION</span><strong id="sessionId">not started</strong></div><div class="buttons"><button id="buildBtn" class="primary">BUILD DEMO RUN</button><button id="verifyBtn" disabled>VERIFY STORED COMMITMENTS</button><button id="tamperBtn" disabled>TAMPER EVENT 04</button><button id="resetBtn">RESET</button></div></section>
+    <section class="timeline-shell"><div class="section-head"><div><p class="eyebrow">CHAIN OF CUSTODY</p><h2>Event timeline</h2></div><div id="statusBadge" class="badge neutral">AWAITING RUN</div></div><div id="timeline" class="timeline" aria-live="polite"></div></section>
+    <section class="panel verifier"><div><p class="eyebrow">VERIFICATION REPORT</p><h2 id="reportTitle">No record yet.</h2><p id="reportText">Build the synthetic run first.</p></div><div class="anchor"><span>STORED FINAL ANCHOR</span><code id="anchorHash">—</code><span>AUTHENTICATED RELEASE</span><code id="externalAnchor">AUTHENTICATED DEMO RELEASE CONTRACT ON EXPORT</code></div></section>
+    <section class="export panel"><div><p class="eyebrow">PORTABLE EVIDENCE</p><h2>Take the record with you.</h2><p>The downloaded JSON contains the evidence, the current PASS/FAIL result, local UTC traceability and the Ed25519-signed RFTSystems4Ai release contract needed for independent offline verification.</p></div><button id="downloadBtn" disabled>DOWNLOAD VERIFIED BUNDLE ↗</button></section>
+    <section class="next"><span>RECORD</span><i>→</i><b>SEAL</b><i>→</i><span>VERIFY</span><i>→</i><span>REPLAY</span><i>→</i><span>DIFF</span><i>→</i><span>AUDIT</span><a href="../../">BACK TO START HERE</a></section>
+  </main>
+  <footer class="legal-footer"><span>RFTSystems4Ai is a trading name of Liam S Grinstead, sole trader.</span><span>© 2026 Liam S Grinstead. All rights reserved.</span></footer>
+  <script src="../../assets/official-release.js"></script><script src="../../assets/demo-bundle.js"></script><script src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'none'">
+  <meta name="description" content="Independent local verification for RFTSystems4Ai signed demo-release artefacts.">
+  <meta name="theme-color" content="#050814">
+  <title>Official Artefact Verifier — RFTSystems4Ai</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="../../assets/legal-footer.css">
+</head>
+<body>
+<header><a href="../../">RFTSYSTEMS4AI <span>/ OFFICIAL ARTEFACT VERIFIER</span></a><b>LOCAL · PINNED RELEASE KEY · NO SERVER</b></header>
+<main>
+  <section class="hero">
+    <p class="eyebrow">VERIFY THE VERIFIER</p>
+    <h1>Does this artefact survive an <em>authenticated RFTSystems4Ai release contract?</em></h1>
+    <p class="lead">Drop a demo receipt bundle locally. This page authenticates the signed RFTSystems4Ai release with Ed25519, rejects missing or unauthorised fields, then independently recomputes the complete declared artefact contract.</p>
+    <div class="scope"><strong>The release signature authenticates RFTSystems4Ai's published demo contract, issuer identity and release UTC.</strong> The artefact verdict and declared semantic fields are then derived locally; changing PASS/FAIL, scope, run bindings or report contents causes rejection. The browser download time is traceability metadata only and is not an independently trusted timestamp.</div>
+  </section>
+  <section class="panel drop" id="dropZone">
+    <label for="receiptFile"><span>RFTSYSTEMS4AI DEMO RECEIPT BUNDLE</span><strong>DROP FILE HERE</strong><small>or choose a JSON file from this device</small></label>
+    <input id="receiptFile" type="file" accept="application/json,.json">
+    <button id="resetBtn" type="button">RESET</button>
+  </section>
+  <section class="verdict neutral" id="verdict" aria-live="polite">
+    <span>RFTSYSTEMS4AI AUTHENTICATED DEMO</span><strong id="verdictWord">AWAITING ARTEFACT</strong><p id="verdictDetail">Drop an RFTSystems4Ai demo receipt bundle.</p>
+  </section>
+  <section class="panel details">
+    <div><span>ISSUER</span><code id="issuer">—</code></div>
+    <div><span>SOURCE</span><code id="surface">—</code></div>
+    <div><span>SIGNED RELEASE UTC</span><code id="releaseUtc">—</code></div>
+    <div><span>UNTRUSTED LOCAL DOWNLOAD UTC</span><code id="downloadUtc">—</code></div>
+    <div><span>DERIVED VERDICT</span><code id="result">—</code></div>
+    <div><span>RELEASE KEY ID</span><code id="keyId">—</code></div>
+    <div><span>SIGNED RELEASE CORE SHA-256</span><code id="coreHash">—</code></div>
+    <div><span>ARTEFACT CONTRACT</span><code id="artifactMatch">—</code></div>
+  </section>
+  <section class="principle"><b>No valid RFTSystems4Ai release signature → no authenticated RFTSystems4Ai demo contract.</b><span>Authenticated verification ≠ factual truth.</span></section>
+</main>
+<footer class="legal-footer"><span>RFTSystems4Ai is a trading name of Liam S Grinstead, sole trader.</span><span>© 2026 Liam S Grinstead. All rights reserved.</span></footer>
+<script type="module" src="./app.js"></script>
+</body>
+</html>
