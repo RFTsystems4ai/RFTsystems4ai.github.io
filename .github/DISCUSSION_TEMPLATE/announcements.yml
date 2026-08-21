@@ -1,0 +1,23 @@
+title: "[Announcement] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Official RFTSystems4Ai announcements should describe what changed, where it can be tested, and any important verification-scope or compatibility notes.
+  - type: textarea
+    id: update
+    attributes:
+      label: What is being announced?
+      placeholder: Describe the release, public demonstration update or community notice.
+    validations:
+      required: true
+  - type: textarea
+    id: test
+    attributes:
+      label: Where can people test or inspect it?
+      placeholder: Add a public demonstration or verifier link where relevant.
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope or limitations
+      placeholder: State anything the announcement should not be interpreted as proving.

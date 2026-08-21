@@ -1,0 +1,36 @@
+title: "[General] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this space for open discussion about the public RFTSystems4Ai demonstrations. Keep observations separate from assumptions, and avoid posting private or confidential information.
+  - type: textarea
+    id: topic
+    attributes:
+      label: What would you like to discuss?
+      description: Give enough context for another person to understand the point or reproduce what you observed.
+      placeholder: Describe the question, observation or topic.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Which public demonstration is most relevant?
+      options:
+        - Agent Flight Recorder
+        - Memory Receipt Engine
+        - TimelineDiff
+        - TrustStack
+        - Official Artefact Verifier
+        - Falsification Challenge #001
+        - Evolution Data / DecisionFamily
+        - General RFTSystems4Ai
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence or context
+      description: Optional public-safe receipt details, verifier result, browser information or reproduction notes.
+      placeholder: Add evidence or context here. Do not post credentials, signing keys or confidential data.

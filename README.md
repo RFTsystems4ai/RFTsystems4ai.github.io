@@ -20,5 +20,9 @@ RFTSystems4Ai provides live demonstrations for AI verification, falsification, a
 - [Evolution Data — DecisionFamily Revaluation](https://rftsystems4ai.github.io/evolution-data/)
 - [Independent Evolution Data Verifier](https://rftsystems4ai.github.io/evolution-data/verify.html)
 
+### Community
+
+[Join RFTSystems4Ai Community Discussions →](https://rftsystems4ai.github.io/community/)
+
 RFTSystems4Ai is a trading name of Liam S Grinstead, sole trader.  
 © 2026 Liam S Grinstead. All rights reserved.

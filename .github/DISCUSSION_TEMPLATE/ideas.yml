@@ -1,0 +1,26 @@
+title: "[Idea] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ideas are welcome when they make a public demonstration easier to test, falsify, verify or understand. Please describe the value without exposing private company information or proprietary implementation details.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem or opportunity have you noticed?
+      placeholder: Describe the problem, gap or opportunity.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What is your idea?
+      placeholder: Explain the proposed improvement or new public demonstration.
+    validations:
+      required: true
+  - type: textarea
+    id: test
+    attributes:
+      label: How could we test whether it works?
+      description: A useful idea should have a clear way to judge whether it improves the public evidence or user experience.
+      placeholder: Describe a simple success/failure test.
