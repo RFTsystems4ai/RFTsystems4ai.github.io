@@ -16,8 +16,8 @@
   <section class="hero">
     <p class="eyebrow">VERIFY THE VERIFIER</p>
     <h1>Does this artefact survive an <em>authenticated RFTSystems4Ai release contract?</em></h1>
-    <p class="lead">Drop a demo receipt bundle locally. This page first authenticates the signed RFTSystems4Ai release with Ed25519, then independently recomputes the bundled artefact against the exact signed demonstration contract.</p>
-    <div class="scope"><strong>The release signature authenticates RFTSystems4Ai's published demo contract and release UTC.</strong> The artefact verdict is then derived locally; a caller cannot turn FAIL into PASS by editing the JSON. The local download time is recorded for traceability but is not represented as an independent trusted timestamp.</div>
+    <p class="lead">Drop a demo receipt bundle locally. This page authenticates the signed RFTSystems4Ai release with Ed25519, rejects missing or unauthorised fields, then independently recomputes the complete declared artefact contract.</p>
+    <div class="scope"><strong>The release signature authenticates RFTSystems4Ai's published demo contract, issuer identity and release UTC.</strong> The artefact verdict and declared semantic fields are then derived locally; changing PASS/FAIL, scope, run bindings or report contents causes rejection. The browser download time is traceability metadata only and is not an independently trusted timestamp.</div>
   </section>
   <section class="panel drop" id="dropZone">
     <label for="receiptFile"><span>RFTSYSTEMS4AI DEMO RECEIPT BUNDLE</span><strong>DROP FILE HERE</strong><small>or choose a JSON file from this device</small></label>
@@ -31,11 +31,11 @@
     <div><span>ISSUER</span><code id="issuer">—</code></div>
     <div><span>SOURCE</span><code id="surface">—</code></div>
     <div><span>SIGNED RELEASE UTC</span><code id="releaseUtc">—</code></div>
-    <div><span>LOCAL DOWNLOAD UTC</span><code id="downloadUtc">—</code></div>
+    <div><span>UNTRUSTED LOCAL DOWNLOAD UTC</span><code id="downloadUtc">—</code></div>
     <div><span>DERIVED VERDICT</span><code id="result">—</code></div>
     <div><span>RELEASE KEY ID</span><code id="keyId">—</code></div>
     <div><span>SIGNED RELEASE CORE SHA-256</span><code id="coreHash">—</code></div>
-    <div><span>ARTEFACT COMMITMENT</span><code id="artifactMatch">—</code></div>
+    <div><span>ARTEFACT CONTRACT</span><code id="artifactMatch">—</code></div>
   </section>
   <section class="principle"><b>No valid RFTSystems4Ai release signature → no authenticated RFTSystems4Ai demo contract.</b><span>Authenticated verification ≠ factual truth.</span></section>
 </main>
